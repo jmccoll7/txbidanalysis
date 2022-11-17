@@ -2,23 +2,36 @@
   "name": "txbidanalysis-backend",
   "version": "1.0.0",
   "description": "Backend server for web application for querying and analysis of TXDOT construction bid data.",
-  "main": "src/app.ts",
+  "main": "src/index.ts",
   "repository": "https://github.com/jmccoll7/txbidanalysis.git",
   "author": "James McColl",
   "license": "GNU General Public License v3.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "build": "tsc",
-    "watch": "tsc-w",
-    "start": "node ./bin/app.js",
-    "dev": "nodemon ./bin/app.js",
-    "ts-dev": "ts-node ./src/app.ts"
+    "watch": "tsc -w",
+    "start": "node ./bin/index.js",
+    "dev": "nodemon --es-module-specifier-resolution=node ./bin/index.js"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.12",
     "@types/node": "^18.11.0",
     "nodemon": "^2.0.20",
     "ts-node": "^10.9.1",
     "typescript": "^4.8.4"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@apollo/server": "^4.1.1",
+    "body-parser": "^1.20.1",
+    "class-validator": "^0.13.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "graphql": "^16.6.0",
+    "mysql": "^2.18.1",
+    "reflect-metadata": "^0.1.13",
+    "type": "^2.7.2",
+    "type-graphql": "^2.0.0-beta.1",
+    "typeorm": "^0.3.10"
+  }
 }
