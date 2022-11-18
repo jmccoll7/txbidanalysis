@@ -7,22 +7,33 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { Resolver, Query } from "type-graphql";
-import { Book } from "../entities/book-entity";
-// Type Definition
-// Resolver
-let BookResolver = class BookResolver {
-    books() {
-        return Book;
+import { ObjectType, Field, Resolver, Query } from "type-graphql";
+import { Project } from "../entities/project-entity";
+let PaginatedProjects = class PaginatedProjects {
+};
+__decorate([
+    Field(() => [Project]),
+    __metadata("design:type", Array)
+], PaginatedProjects.prototype, "projects", void 0);
+__decorate([
+    Field(),
+    __metadata("design:type", Boolean)
+], PaginatedProjects.prototype, "hasMore", void 0);
+PaginatedProjects = __decorate([
+    ObjectType()
+], PaginatedProjects);
+let ProjectResolver = class ProjectResolver {
+    projects() {
+        return Project.find();
     }
 };
 __decorate([
-    Query(() => [Book]),
+    Query(() => [Project]),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
-], BookResolver.prototype, "books", null);
-BookResolver = __decorate([
-    Resolver(Book)
-], BookResolver);
-export { BookResolver };
+], ProjectResolver.prototype, "projects", null);
+ProjectResolver = __decorate([
+    Resolver(Project)
+], ProjectResolver);
+export { ProjectResolver };

@@ -5,12 +5,21 @@ import cors from "cors";
 import express from "express";
 import "reflect-metadata";
 import { buildSchema } from "type-graphql";
-import { BookResolver } from "./resolvers/book-resolvers";
+import { AppDataSource } from "./data-source";
+import { ItemResolver } from "./resolvers/item-resolver";
+import { PriceResolver } from "./resolvers/price-resolver";
+import { ProjectResolver } from "./resolvers/project-resolver";
 
+// TypeORM
+AppDataSource.initialize()
+  .then(() => {
+    // here you can start to work with your database
+  })
+  .catch((error) => console.log(error));
 
 // TypeGraphQL
 const schema = await buildSchema({
-  resolvers: [BookResolver],
+  resolvers: [ItemResolver, PriceResolver, ProjectResolver, ItemResolver],
 });
 
 // ApolloServer
@@ -21,14 +30,26 @@ const server = new ApolloServer({
 await server.start();
 
 // Express
-const port = 4000;
-const hostname = "localhost";
+const port: number = 4000;
+const hostname: string = "localhost";
 
 const app = express();
+
+app.get("/", (req, res) => {
+  res.send('App Up! 👍')
+});
+
+app.get("/dog", (req, res) => {
+  res.json({
+    'name':'Bruno',
+    'age':'5',
+    'image':'https://post.medicalnewstoday.com/wp-content/uploads/sites/3/2020/02/322868_1100-800x825.jpg'
+})
+});
 
 // Express using body-parser, cors, and Apollo
 app.use("/graphql", bodyParser.json(), cors(), expressMiddleware(server));
 
-app.listen(4000, hostname, () => {
+app.listen(port, hostname, () => {
   console.log(`GraphQL API listening on port ${port}`);
 });

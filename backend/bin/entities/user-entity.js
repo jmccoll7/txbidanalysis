@@ -7,22 +7,22 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { Resolver, Query } from "type-graphql";
-import { Book } from "../entities/book-entity";
-// Type Definition
-// Resolver
-let BookResolver = class BookResolver {
-    books() {
-        return Book;
-    }
+import { ObjectType, Field } from "type-graphql";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+let User = class User {
 };
 __decorate([
-    Query(() => [Book]),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
-], BookResolver.prototype, "books", null);
-BookResolver = __decorate([
-    Resolver(Book)
-], BookResolver);
-export { BookResolver };
+    Field(),
+    PrimaryGeneratedColumn(),
+    __metadata("design:type", Number)
+], User.prototype, "id", void 0);
+__decorate([
+    Field(),
+    Column(),
+    __metadata("design:type", String)
+], User.prototype, "username", void 0);
+User = __decorate([
+    Entity(),
+    ObjectType()
+], User);
+export { User };

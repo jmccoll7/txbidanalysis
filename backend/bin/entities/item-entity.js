@@ -8,26 +8,31 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 import { ObjectType, Field } from "type-graphql";
-import { BaseEntity, Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-let Book = class Book extends BaseEntity {
+import { BaseEntity, Entity, PrimaryColumn, Column, OneToMany } from "typeorm";
+import { Price } from "./price-entity";
+let Item = class Item extends BaseEntity {
 };
 __decorate([
     Field(),
-    PrimaryGeneratedColumn(),
+    PrimaryColumn(),
     __metadata("design:type", Number)
-], Book.prototype, "id", void 0);
+], Item.prototype, "item_code", void 0);
 __decorate([
     Field(),
-    Column({ length: 100 }),
+    Column({ length: 128 }),
     __metadata("design:type", String)
-], Book.prototype, "title", void 0);
+], Item.prototype, "item_description", void 0);
 __decorate([
     Field(),
-    Column(),
+    Column({ length: 8 }),
     __metadata("design:type", String)
-], Book.prototype, "author", void 0);
-Book = __decorate([
+], Item.prototype, "item_unit", void 0);
+__decorate([
+    OneToMany(() => Price, (price) => price.item_code),
+    __metadata("design:type", Array)
+], Item.prototype, "prices", void 0);
+Item = __decorate([
     Entity(),
     ObjectType()
-], Book);
-export { Book };
+], Item);
+export { Item };
