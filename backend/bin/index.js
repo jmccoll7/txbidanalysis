@@ -3,6 +3,9 @@ import { expressMiddleware } from "@apollo/server/express4";
 import bodyParser from "body-parser";
 import cors from "cors";
 import express from "express";
+import session from "express-session";
+import connectRedis from "connect-redis";
+import { createClient } from "redis";
 import "reflect-metadata";
 import { buildSchema } from "type-graphql";
 import { AppDataSource } from "./data-source";
@@ -28,18 +31,24 @@ await server.start();
 const port = 4000;
 const hostname = "localhost";
 const app = express();
-app.get("/", (req, res) => {
-    res.send('App Up! 👍');
+// Redis Client
+const redisClient = createClient({
+    legacyMode: true,
 });
-app.get("/dog", (req, res) => {
-    res.json({
-        'name': 'Bruno',
-        'age': '5',
-        'image': 'https://post.medicalnewstoday.com/wp-content/uploads/sites/3/2020/02/322868_1100-800x825.jpg'
-    });
-});
+redisClient.connect().catch(console.error);
+// Express-Session with Redis-Connect
+const RedisStore = connectRedis(session);
+app.use(session({
+    store: new RedisStore({ client: redisClient }),
+    saveUninitialized: false,
+    secret: "ajijfopsdppfjiweriufwqiorjfnksdlkjj",
+    resave: false,
+}));
+const corsOptions = {
+    origin: process.env.FRONTEND_URL,
+};
 // Express using body-parser, cors, and Apollo
-app.use("/graphql", bodyParser.json(), cors(), expressMiddleware(server));
+app.use("/graphql", bodyParser.json(), cors(corsOptions), expressMiddleware(server));
 app.listen(port, hostname, () => {
     console.log(`GraphQL API listening on port ${port}`);
 });
