@@ -1,14 +1,17 @@
-import { ObjectType, Field } from "type-graphql"
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
+import { ObjectType, Field, Int } from "type-graphql"
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, Unique } from "typeorm"
 
-@Entity()
+@Entity("user")
 @ObjectType()
-export class User {
-  @Field()
+export class User extends BaseEntity {
+  @Field(() => Int)
   @PrimaryGeneratedColumn()
   id!: number;
 
   @Field()
   @Column()
-  username!: string;
+  email!: string;
+
+  @Column()
+  password!: string;
 }

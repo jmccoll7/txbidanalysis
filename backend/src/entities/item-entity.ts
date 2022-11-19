@@ -1,4 +1,4 @@
-import { ObjectType, Field } from "type-graphql"
+import { ObjectType, Field, Int } from "type-graphql"
 import { BaseEntity, Entity, PrimaryColumn, Column, OneToMany } from "typeorm"
 import { Price } from "./price-entity";
 
@@ -6,7 +6,7 @@ import { Price } from "./price-entity";
 @ObjectType()
 export class Item extends BaseEntity {
 
-  @Field()
+  @Field(() => Int)
   @PrimaryColumn()
   item_code!: number
 

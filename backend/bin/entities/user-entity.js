@@ -7,12 +7,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { ObjectType, Field } from "type-graphql";
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
-let User = class User {
+import { ObjectType, Field, Int } from "type-graphql";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm";
+let User = class User extends BaseEntity {
 };
 __decorate([
-    Field(),
+    Field(() => Int),
     PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
 ], User.prototype, "id", void 0);
@@ -20,9 +20,13 @@ __decorate([
     Field(),
     Column(),
     __metadata("design:type", String)
-], User.prototype, "username", void 0);
+], User.prototype, "email", void 0);
+__decorate([
+    Column(),
+    __metadata("design:type", String)
+], User.prototype, "password", void 0);
 User = __decorate([
-    Entity(),
+    Entity("user"),
     ObjectType()
 ], User);
 export { User };

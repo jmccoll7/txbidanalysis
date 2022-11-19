@@ -8,14 +8,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 import { Entity, Column, PrimaryGeneratedColumn, Unique, BaseEntity, ManyToOne, JoinColumn, } from "typeorm";
-import { Field, Float, ObjectType } from "type-graphql";
+import { Field, Float, Int, ObjectType } from "type-graphql";
 import { Item } from "./item-entity";
 import { Project } from "./project-entity";
 // Define price table (entity)
 let Price = class Price extends BaseEntity {
 };
 __decorate([
-    Field(),
+    Field(() => Int),
     PrimaryGeneratedColumn(),
     __metadata("design:type", Number)
 ], Price.prototype, "id", void 0);

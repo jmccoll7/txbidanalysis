@@ -1,16 +1,17 @@
+import dotenv from "dotenv";
+dotenv.config();
 import "reflect-metadata";
 import { DataSource } from "typeorm";
 import { Item } from "./entities/item-entity";
 import { Price } from "./entities/price-entity";
 import { Project } from "./entities/project-entity";
+import { User } from "./entities/user-entity";
 export const AppDataSource = new DataSource({
     type: "mysql",
-    host: "localhost",
-    port: 3306,
     url: process.env.DATABASE_URL,
     synchronize: true,
-    logging: false,
-    entities: [Item, Price, Project],
+    logging: true,
+    entities: [Item, Price, Project, User],
     migrations: [],
     subscribers: [],
 });

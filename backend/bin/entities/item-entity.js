@@ -7,13 +7,13 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { ObjectType, Field } from "type-graphql";
+import { ObjectType, Field, Int } from "type-graphql";
 import { BaseEntity, Entity, PrimaryColumn, Column, OneToMany } from "typeorm";
 import { Price } from "./price-entity";
 let Item = class Item extends BaseEntity {
 };
 __decorate([
-    Field(),
+    Field(() => Int),
     PrimaryColumn(),
     __metadata("design:type", Number)
 ], Item.prototype, "item_code", void 0);

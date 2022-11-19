@@ -7,7 +7,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from "typeorm";
-import { Field, Float, ObjectType } from "type-graphql";
+import { Field, Float, Int, ObjectType } from "type-graphql";
 import { Item } from "./item-entity";
 import { Project } from "./project-entity";
 
@@ -18,7 +18,7 @@ import { Project } from "./project-entity";
 export class Price extends BaseEntity {
   // Unique constraint for "item_code, project, contractor" columns
   // Columns:
-  @Field()
+  @Field(() => Int)
   @PrimaryGeneratedColumn()
   id!: number;
 
