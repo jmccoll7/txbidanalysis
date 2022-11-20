@@ -1,24 +1,26 @@
-import { ViewIcon, ViewOffIcon } from "@chakra-ui/icons";
 import {
   Box,
   Button,
   Flex,
-  FormControl,
-  FormLabel,
-  Heading, Input,
-  InputGroup,
-  InputRightElement,
+  Heading,
   Link,
   Stack,
   Text,
-  useColorModeValue
+  useColorModeValue,
 } from "@chakra-ui/react";
+import { Form, Formik, FormikProps, useFormik } from "formik";
 import React, { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { AppHeader } from "../components/AppHeader";
 import { ColorModeSwitcher } from "../components/ColorModeSwitcher";
+import { InputField, PasswordInputField } from "../components/InputField";
 
 interface SignUpProps {}
+
+interface Values {
+  email: string;
+  password: string;
+}
 
 export const SignUp: React.FC<SignUpProps> = ({}) => {
   const [showPassword, setShowPassword] = useState(false);
@@ -61,39 +63,51 @@ export const SignUp: React.FC<SignUpProps> = ({}) => {
             minW={"400px"}
           >
             <Stack spacing={4}>
-              <FormControl id="email" isRequired>
-                <FormLabel>Email address</FormLabel>
-                <Input type="email" />
-              </FormControl>
-              <FormControl id="password" isRequired>
-                <FormLabel>Password</FormLabel>
-                <InputGroup>
-                  <Input type={showPassword ? "text" : "password"} />
-                  <InputRightElement h={"full"}>
-                    <Button
-                      variant={"ghost"}
+              <Formik
+                initialValues={{
+                  email: "",
+                  password: "",
+                }}
+                onSubmit={async (values) => {
+                  console.log("Registration complete");
+                  console.log(values.email, values.password);
+                }}
+              >
+                {(props: FormikProps<Values>) => (
+                  <Form>
+                    <InputField
+                      isRequired={true}
+                      name="email"
+                      type="email"
+                      label="Email address"
+                    />
+                    <PasswordInputField
+                      showPassword={showPassword}
                       onClick={() =>
                         setShowPassword((showPassword) => !showPassword)
                       }
-                    >
-                      {showPassword ? <ViewIcon /> : <ViewOffIcon />}
-                    </Button>
-                  </InputRightElement>
-                </InputGroup>
-              </FormControl>
-              <Stack spacing={10} pt={2}>
-                <Button
-                  loadingText="Submitting"
-                  size="lg"
-                  bg={"blue.400"}
-                  color={"white"}
-                  _hover={{
-                    bg: "blue.500",
-                  }}
-                >
-                  Sign up
-                </Button>
-              </Stack>
+                      isRequired={true}
+                      name="password"
+                      type={showPassword ? "text" : "password"}
+                      label="Password"
+                    />
+                    <Stack spacing={10} pt={2}>
+                      <Button
+                        loadingText="Submitting"
+                        size="lg"
+                        bg={"blue.400"}
+                        color={"white"}
+                        _hover={{
+                          bg: "blue.500",
+                        }}
+                        type="submit"
+                      >
+                        Sign up
+                      </Button>
+                    </Stack>
+                  </Form>
+                )}
+              </Formik>
               <Stack pt={6}>
                 <Text align={"center"}>
                   Already a user?{" "}
@@ -101,7 +115,7 @@ export const SignUp: React.FC<SignUpProps> = ({}) => {
                     as={RouterLink}
                     to="/login"
                     _hover={{
-                      color: "blue.500"
+                      color: "blue.500",
                     }}
                     color={"blue.400"}
                   >

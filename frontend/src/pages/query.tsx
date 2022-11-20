@@ -32,8 +32,8 @@ export const Query: React.FC<QueryProps> = ({}) => {
         {(props) => (
           <Form>
             <HStack pl={4} marginTop={4} mr={4} alignItems={"start"}>
-              <InputField name="startDate" type="date" label="Start Date" />
-              <InputField name="endDate" type="date" label="End Date" />
+              <InputField isRequired={false} name="startDate" type="date" label="Start Date" />
+              <InputField isRequired={false} name="endDate" type="date" label="End Date" />
               <Field name="contractors">
                 {(props: any) => {
                   console.log(props.field, props.form, props.meta, props);
