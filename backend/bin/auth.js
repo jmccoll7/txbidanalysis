@@ -5,9 +5,17 @@ export const createAccessToken = (user) => {
     });
 };
 export const createRefreshToken = (user) => {
-    return jwt.sign({ userId: user.id }, process.env.REFRESH_TOKEN_PRIVATE_KEY, {
+    return jwt.sign({ userId: user.id, tokenVersion: user.tokenVersion }, process.env.REFRESH_TOKEN_PRIVATE_KEY, {
         expiresIn: "7d",
     });
+};
+export const sendRefreshToken = (res, user) => {
+    res.cookie("jwtcookie", createRefreshToken(user), {
+        httpOnly: true,
+    });
+};
+export const sendInvalidToken = (res) => {
+    res.send({ ok: false, accessToken: "" });
 };
 export const isAuth = ({ context }, next) => {
     const authorization = context.req.headers["authorization"];

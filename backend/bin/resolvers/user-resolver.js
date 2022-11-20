@@ -10,10 +10,11 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-import { Arg, Ctx, Field, Mutation, ObjectType, Query, Resolver, UseMiddleware, } from "type-graphql";
+import { Arg, Ctx, Field, Int, Mutation, ObjectType, Query, Resolver, UseMiddleware, } from "type-graphql";
 import argon2 from "argon2";
 import { User } from "../entities/user-entity";
-import { createAccessToken, createRefreshToken, isAuth } from "../auth";
+import { createAccessToken, isAuth, sendRefreshToken, } from "../auth";
+import { AppDataSource } from "../data-source";
 let LoginResponse = class LoginResponse {
 };
 __decorate([
@@ -46,6 +47,10 @@ let UserResolver = class UserResolver {
         }
         return true;
     }
+    async revokeRefreshTokensForUser(userId) {
+        await AppDataSource.getRepository(User).increment({ id: userId }, "tokenVersion", 1);
+        return true;
+    }
     async login(email, password, ctx) {
         const user = await User.findOneBy({ email: email });
         if (!user) {
@@ -57,9 +62,7 @@ let UserResolver = class UserResolver {
         }
         else {
             // login successful
-            ctx.res.cookie("jwtcookie", createRefreshToken(user), {
-                httpOnly: true,
-            });
+            sendRefreshToken(ctx.res, user);
             return {
                 accessToken: createAccessToken(user),
             };
@@ -94,6 +97,13 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], UserResolver.prototype, "register", null);
+__decorate([
+    Mutation(() => Boolean),
+    __param(0, Arg("userId", () => Int)),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "revokeRefreshTokensForUser", null);
 __decorate([
     Mutation(() => LoginResponse),
     __param(0, Arg("email")),

@@ -8,7 +8,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 import { ObjectType, Field, Int } from "type-graphql";
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, } from "typeorm";
 let User = class User extends BaseEntity {
 };
 __decorate([
@@ -25,6 +25,10 @@ __decorate([
     Column(),
     __metadata("design:type", String)
 ], User.prototype, "password", void 0);
+__decorate([
+    Column("int", { default: 0 }),
+    __metadata("design:type", Number)
+], User.prototype, "tokenVersion", void 0);
 User = __decorate([
     Entity("user"),
     ObjectType()

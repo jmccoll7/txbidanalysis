@@ -17,6 +17,10 @@ import { PriceResolver } from "./resolvers/price-resolver";
 import { ProjectResolver } from "./resolvers/project-resolver";
 import { UserResolver } from "./resolvers/user-resolver";
 import { __prod__ } from "./constants";
+import cookieParser from "cookie-parser";
+import { User } from "./entities/user-entity";
+import { createAccessToken, sendInvalidToken, sendRefreshToken } from "./auth";
+import jwt from "jsonwebtoken";
 // TypeORM
 AppDataSource.initialize()
     .then(() => {
@@ -39,6 +43,32 @@ await server.start();
 const port = 4000;
 const hostname = "localhost";
 const app = express();
+// Cookie-Parser
+app.use(cookieParser());
+app.post("/refresh_token", async (req, res) => {
+    const token = req.cookies.jwtcookie;
+    if (!token) {
+        return sendInvalidToken(res);
+    }
+    let payload = null;
+    try {
+        payload = jwt.verify(token, process.env.REFRESH_TOKEN_PRIVATE_KEY);
+    }
+    catch (err) {
+        console.log(err);
+        return sendInvalidToken(res);
+    }
+    // Token valid. Send access token.
+    const user = await User.findOneBy({ id: payload.userId });
+    if (!user) {
+        return sendInvalidToken(res);
+    }
+    if (user.tokenVersion !== payload.tokenVersion) {
+        sendInvalidToken(res);
+    }
+    sendRefreshToken(res, user);
+    return res.send({ ok: true, accessToken: createAccessToken(user) });
+});
 // Redis Client
 const redisClient = createClient({
     legacyMode: true,

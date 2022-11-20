@@ -2,6 +2,7 @@ import {
   Arg,
   Ctx,
   Field,
+  Int,
   Mutation,
   ObjectType,
   Query,
@@ -11,7 +12,13 @@ import {
 import argon2 from "argon2";
 import { User } from "../entities/user-entity";
 import { AppContext } from "../app-context";
-import { createAccessToken, createRefreshToken, isAuth } from "../auth";
+import {
+  createAccessToken,
+  createRefreshToken,
+  isAuth,
+  sendRefreshToken,
+} from "../auth";
+import { AppDataSource } from "../data-source";
 
 @ObjectType()
 class LoginResponse {
@@ -54,6 +61,16 @@ export class UserResolver {
     return true;
   }
 
+  @Mutation(() => Boolean)
+  async revokeRefreshTokensForUser(@Arg("userId", () => Int) userId: number) {
+    await AppDataSource.getRepository(User).increment(
+      { id: userId },
+      "tokenVersion",
+      1
+    );
+    return true;
+  }
+
   @Mutation(() => LoginResponse)
   async login(
     @Arg("email") email: string,
@@ -70,9 +87,7 @@ export class UserResolver {
       throw new Error("Invalid login.");
     } else {
       // login successful
-      ctx.res.cookie("jwtcookie", createRefreshToken(user), {
-        httpOnly: true,
-      });
+      sendRefreshToken(ctx.res, user);
       return {
         accessToken: createAccessToken(user),
       };
