@@ -11,11 +11,47 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
 import { Price } from "../entities/price-entity";
-import { Arg, FieldResolver, Query, Resolver, Root } from "type-graphql";
+import { Arg, Field, FieldResolver, Float, Int, ObjectType, Query, Resolver, Root, } from "type-graphql";
 import { Item } from "../entities/item-entity";
 import { Project } from "../entities/project-entity";
+let QueryItemsResult = class QueryItemsResult {
+};
+__decorate([
+    Field(() => Float),
+    __metadata("design:type", Number)
+], QueryItemsResult.prototype, "unitPrice", void 0);
+__decorate([
+    Field(),
+    __metadata("design:type", String)
+], QueryItemsResult.prototype, "contractor", void 0);
+__decorate([
+    Field(() => Date),
+    __metadata("design:type", Date)
+], QueryItemsResult.prototype, "bidDate", void 0);
+QueryItemsResult = __decorate([
+    ObjectType()
+], QueryItemsResult);
 // Define queries and updates for item_prices table
 let PriceResolver = class PriceResolver {
+    async queryItems(itemCode, startDate, endDate) {
+        const result = await Price.createQueryBuilder("price")
+            .innerJoinAndSelect("price.project", "project")
+            .select(["price.unit_price", "price.contractor", "project.bid_date"])
+            .where("price.item_code = :itemCode and project.bid_date > :startDate and project.bid_date < :endDate", { itemCode, startDate, endDate })
+            .getMany();
+        const structuredResult = [];
+        result.forEach((item) => {
+            structuredResult.push({
+                unitPrice: item.unit_price,
+                contractor: item.contractor,
+                bidDate: item.project.bid_date,
+            });
+        });
+        // console.log(result[0].unit_price);
+        // console.log(result[0].contractor);
+        // console.log((result[0].project as any).bid_date);
+        return structuredResult;
+    }
     async item(price) {
         return Item.findOne({
             where: {
@@ -39,6 +75,16 @@ let PriceResolver = class PriceResolver {
         return Price.findBy({ item_code });
     }
 };
+__decorate([
+    Query(() => [QueryItemsResult]),
+    __param(0, Arg("itemCode", () => Int)),
+    __param(1, Arg("startDate")),
+    __param(2, Arg("endDate")),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Number, Date,
+        Date]),
+    __metadata("design:returntype", Promise)
+], PriceResolver.prototype, "queryItems", null);
 __decorate([
     FieldResolver(() => Item),
     __param(0, Root()),

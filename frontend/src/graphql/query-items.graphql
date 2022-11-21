@@ -1,0 +1,7 @@
+query QueryItems($itemCode: Int!, $startDate: DateTime!, $endDate: DateTime!) {
+  queryItems(itemCode: $itemCode, startDate: $startDate, endDate: $endDate) {
+    unitPrice
+    contractor
+    bidDate
+  }
+}

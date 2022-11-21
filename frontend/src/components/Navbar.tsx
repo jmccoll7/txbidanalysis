@@ -22,84 +22,130 @@ import {
 } from "@chakra-ui/react";
 import { AppHeader } from "./AppHeader";
 import { ColorModeSwitcher } from "./ColorModeSwitcher";
+import { Link as RouterLink } from "react-router-dom";
+import { useLogoutMutation, useMeQuery } from "../gql/graphql";
+import { setAccessToken } from "../access-token";
 
 interface NavbarProps {}
 
 export const Navbar: React.FC<NavbarProps> = ({}) => {
   const { isOpen, onToggle } = useDisclosure();
-  return (
-    <Box>
-      <Flex
-        bg={useColorModeValue("white", "gray.800")}
-        color={useColorModeValue("gray.600", "white")}
-        minH={"60px"}
-        py={{ base: 2 }}
-        px={{ base: 4 }}
-        borderBottom={1}
-        borderStyle={"solid"}
-        borderColor={useColorModeValue("gray.200", "gray.900")}
-        align={"center"}
+  const { data, loading } = useMeQuery();
+  const [logout, { client }] = useLogoutMutation();
+
+  const linkColor = useColorModeValue("gray.600", "gray.200");
+  const linkHoverColor = useColorModeValue("black", "white");
+
+  // Change navigation options when signed in
+  let signInOptions: any = null;
+  if (loading) {
+    signInOptions = null;
+  } else if (data && data.me) {
+    signInOptions = (
+      <Button
+        fontSize={"sm"}
+        fontWeight={600}
+        variant={"link"}
+        color={linkColor}
+        _hover={{ color: linkHoverColor }}
+        onClick={async () => {
+          await logout();
+          setAccessToken("");
+          await client.resetStore();
+        }}
       >
+        Logout
+      </Button>
+    );
+  } else {
+    signInOptions = (
+      <>
+        <Button
+          as={RouterLink}
+          fontSize={"sm"}
+          fontWeight={400}
+          variant={"link"}
+          to="/login"
+          color={linkColor}
+          _hover={{ color: linkHoverColor }}
+        >
+          Sign In
+        </Button>
+        <Button
+          display={{ base: "none", md: "inline-flex" }}
+          fontSize={"sm"}
+          fontWeight={600}
+          padding={"2"}
+          color={"white"}
+          bg={"pink.400"}
+          _hover={{
+            bg: "pink.300",
+          }}
+          as={RouterLink}
+          variant={"link"}
+          to="/signup"
+        >
+          Sign Up
+        </Button>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Box>
         <Flex
-          flex={{ base: 1, md: "auto" }}
-          ml={{ base: -2 }}
-          display={{ base: "flex", md: "none" }}
+          bg={useColorModeValue("white", "gray.800")}
+          color={useColorModeValue("gray.600", "white")}
+          minH={"60px"}
+          py={{ base: 2 }}
+          px={{ base: 4 }}
+          borderBottom={1}
+          borderStyle={"solid"}
+          borderColor={useColorModeValue("gray.200", "gray.900")}
+          align={"center"}
         >
-          <IconButton
-            onClick={onToggle}
-            icon={
-              isOpen ? <CloseIcon w={3} h={3} /> : <HamburgerIcon w={5} h={5} />
-            }
-            variant={"ghost"}
-            aria-label={"Toggle Navigation"}
-          />
-        </Flex>
-        <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
-          <AppHeader />
-          <Flex display={{ base: "none", md: "flex" }} ml={10}>
-            <DesktopNav />
+          <Flex
+            flex={{ base: 1, md: "auto" }}
+            ml={{ base: -2 }}
+            display={{ base: "flex", md: "none" }}
+          >
+            <IconButton
+              onClick={onToggle}
+              icon={
+                isOpen ? (
+                  <CloseIcon w={3} h={3} />
+                ) : (
+                  <HamburgerIcon w={5} h={5} />
+                )
+              }
+              variant={"ghost"}
+              aria-label={"Toggle Navigation"}
+            />
           </Flex>
+          <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
+            <AppHeader />
+            <Flex display={{ base: "none", md: "flex" }} ml={10}>
+              <DesktopNav />
+            </Flex>
+          </Flex>
+
+          <Stack
+            flex={{ base: 1, md: 0 }}
+            justify={"flex-end"}
+            direction={"row"}
+            spacing={6}
+          >
+            <ColorModeSwitcher justifySelf="flex-end" />
+            {signInOptions}
+          </Stack>
         </Flex>
 
-        <Stack
-          flex={{ base: 1, md: 0 }}
-          justify={"flex-end"}
-          direction={"row"}
-          spacing={6}
-        >
-          <ColorModeSwitcher justifySelf="flex-end" />
-          <Button
-            as={"a"}
-            fontSize={"sm"}
-            fontWeight={400}
-            variant={"link"}
-            href={"/login"}
-          >
-            Sign In
-          </Button>
-          <Button
-            display={{ base: "none", md: "inline-flex" }}
-            fontSize={"sm"}
-            fontWeight={600}
-            padding={"2"}
-            color={"white"}
-            bg={"pink.400"}
-            _hover={{
-              bg: "pink.300",
-            }}
-            as={"a"}
-            variant={"link"}
-            href={"/login"}
-          >
-            Sign Up
-          </Button>
-        </Stack>
-      </Flex>
-
-      <Collapse in={isOpen} animateOpacity>
-        <MobileNav />
-      </Collapse>
-    </Box>
+        <Collapse in={isOpen} animateOpacity>
+          <MobileNav />
+        </Collapse>
+      </Box>
+    </>
   );
 };
 
@@ -266,7 +312,16 @@ interface NavItem {
 const NAV_ITEMS: Array<NavItem> = [
   {
     label: "Query Project Data",
-    href: "/query",
+    children: [
+      {
+        label: "Search Item Codes",
+        href: "/itemsearch",
+      },
+      {
+        label: "Query Price Trends by Item",
+        href: "/query",
+      },
+    ]
   },
   {
     label: "Data Visualization",

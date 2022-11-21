@@ -1,3 +1,6 @@
-query Hello {
-  me
+query Me {
+  me {
+    id
+    email
+  }
 }

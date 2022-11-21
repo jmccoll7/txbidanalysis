@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   BaseEntity,
+  Unique,
 } from "typeorm";
 
 @Entity("user")

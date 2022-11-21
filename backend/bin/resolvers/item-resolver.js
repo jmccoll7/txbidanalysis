@@ -7,30 +7,24 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-import { ObjectType, Field, Resolver, Query } from "type-graphql";
-import { Item } from "../entities/item-entity";
-let PaginatedItems = class PaginatedItems {
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
 };
-__decorate([
-    Field(() => [Item]),
-    __metadata("design:type", Array)
-], PaginatedItems.prototype, "items", void 0);
-__decorate([
-    Field(),
-    __metadata("design:type", Boolean)
-], PaginatedItems.prototype, "hasMore", void 0);
-PaginatedItems = __decorate([
-    ObjectType()
-], PaginatedItems);
+import { Resolver, Query, Arg } from "type-graphql";
+import { Item } from "../entities/item-entity";
+import { Like } from "typeorm";
 let ItemResolver = class ItemResolver {
-    items() {
-        return Item.find();
+    items(searchInput) {
+        return Item.findBy({
+            item_description: Like(`%${searchInput}%`)
+        });
     }
 };
 __decorate([
     Query(() => [Item]),
+    __param(0, Arg("searchInput")),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], ItemResolver.prototype, "items", null);
 ItemResolver = __decorate([

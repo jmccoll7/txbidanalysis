@@ -19,7 +19,7 @@ import { UserResolver } from "./resolvers/user-resolver";
 import { __prod__ } from "./constants";
 import cookieParser from "cookie-parser";
 import { User } from "./entities/user-entity";
-import { createAccessToken, createRefreshToken, sendInvalidToken, sendRefreshToken } from "./auth";
+import { createAccessToken, sendInvalidToken, sendRefreshToken } from "./auth";
 import jwt from "jsonwebtoken";
 
 // TypeORM
@@ -52,31 +52,6 @@ const app = express();
 
 // Cookie-Parser
 app.use(cookieParser());
-app.post("/refresh_token", async (req, res) => {
-  const token = req.cookies.jwtcookie;
-  if (!token) {
-    return sendInvalidToken(res);
-  }
-  let payload: any = null;
-  try {
-    payload = jwt.verify(token, process.env.REFRESH_TOKEN_PRIVATE_KEY!);
-  } catch (err) {
-    console.log(err);
-    return sendInvalidToken(res);
-  }
-  // Token valid. Send access token.
-  const user = await User.findOneBy({ id: payload.userId });
-
-  if (!user) {
-    return sendInvalidToken(res);
-  }
-
-  if (user.tokenVersion !== payload.tokenVersion) {
-    sendInvalidToken(res);
-  }
-  sendRefreshToken(res, user)
-  return res.send({ ok: true, accessToken: createAccessToken(user) });
-});
 
 // Redis Client
 const redisClient = createClient({
@@ -104,6 +79,7 @@ app.use(
 
 const corsOptions = {
   origin: process.env.FRONTEND_URL,
+  credentials: true
 };
 
 app.set("trust proxy", !__prod__);
@@ -118,6 +94,32 @@ app.use(
     context: async ({ req, res }) => ({ req, res }),
   })
 );
+
+app.post("/refresh_token", cors(corsOptions), async (req, res) => {
+  const token = req.cookies.jwtcookie;
+  if (!token) {
+    return sendInvalidToken(res);
+  }
+  let payload: any = null;
+  try {
+    payload = jwt.verify(token, process.env.REFRESH_TOKEN_PRIVATE_KEY!);
+  } catch (err) {
+    console.log(err);
+    return sendInvalidToken(res);
+  }
+  // Token valid. Send access token.
+  const user = await User.findOneBy({ id: payload.userId });
+
+  if (!user) {
+    return sendInvalidToken(res);
+  }
+
+  if (user.tokenVersion !== payload.tokenVersion) {
+    sendInvalidToken(res);
+  }
+  sendRefreshToken(res, user);
+  return res.send({ ok: true, accessToken: createAccessToken(user) });
+});
 
 app.listen(port, hostname, () => {
   console.log(`GraphQL API listening on port ${port}`);

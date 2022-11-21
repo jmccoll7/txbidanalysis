@@ -1,18 +1,16 @@
-import { ObjectType, Field, Resolver, Query } from "type-graphql";
+import { ObjectType, Field, Resolver, Query, Ctx, Arg } from "type-graphql";
+import { AppContext } from "../app-context";
 import { Item } from "../entities/item-entity";
-
-@ObjectType()
-class PaginatedItems {
-  @Field(() => [Item])
-  items!: Item[];
-  @Field()
-  hasMore!: boolean;
-}
+import { Like } from "typeorm"
 
 @Resolver(Item)
 export class ItemResolver {
   @Query(() => [Item])
-  items() {
-    return Item.find();
+  items(
+    @Arg("searchInput") searchInput: string
+  ) {
+    return Item.findBy({
+      item_description: Like(`%${searchInput}%`)
+    })
   }
 }

@@ -15,10 +15,12 @@
     "@types/node": "^18.11.9",
     "@types/react": "^18.0.9",
     "@types/react-dom": "^18.0.4",
+    "apollo-link-token-refresh": "^0.4.0",
     "chakra-react-select": "^4.4.0",
     "formik": "^2.2.9",
     "framer-motion": "^7.6.7",
     "graphql": "^16.6.0",
+    "jwt-decode": "^3.1.2",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-icons": "^4.6.0",
@@ -32,7 +34,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "gen": "graphql-codegen --config codegen.ts"
+    "gen": "graphql-codegen --config codegen.ts",
+    "gen-w": "graphql-codegen --config codegen.ts --watch"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -51,10 +54,11 @@
   },
   "devDependencies": {
     "@graphql-codegen/cli": "2.13.12",
-    "@graphql-codegen/client-preset": "1.1.4",
+    "@graphql-codegen/client-preset": "^1.1.4",
     "@graphql-codegen/typescript": "^2.8.2",
     "@graphql-codegen/typescript-operations": "^2.5.7",
     "@graphql-codegen/typescript-react-apollo": "^3.3.6",
-    "@types/graphql": "^14.5.0"
+    "@types/graphql": "^14.5.0",
+    "@types/jwt-decode": "^3.1.0"
   }
 }

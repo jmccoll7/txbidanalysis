@@ -6,7 +6,7 @@ import { Response } from "express";
 
 export const createAccessToken = (user: User) => {
   return jwt.sign({ userId: user.id }, process.env.ACCESS_TOKEN_PRIVATE_KEY!, {
-    expiresIn: "15m",
+    expiresIn: "10m",
   });
 };
 
@@ -23,13 +23,20 @@ export const createRefreshToken = (user: User) => {
 export const sendRefreshToken = (res: Response, user: User) => {
   res.cookie("jwtcookie", createRefreshToken(user), {
     httpOnly: true,
+    path: "/refresh_token",
+  });
+};
+
+export const clearRefreshToken = (res: Response) => {
+  res.cookie("jwtcookie", "", {
+    httpOnly: true,
+    path: "/refresh_token",
   });
 };
 
 export const sendInvalidToken = (res: Response) => {
   res.send({ ok: false, accessToken: "" });
-}
-
+};
 
 export const isAuth: Middleware<AppContext> = ({ context }, next) => {
   const authorization = context.req.headers["authorization"];

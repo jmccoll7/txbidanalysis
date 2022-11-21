@@ -7,26 +7,36 @@ import {
   Button,
   InputGroup,
   InputRightElement,
+  FormControlProps,
+  ResponsiveValue,
 } from "@chakra-ui/react";
 import { useField } from "formik";
-import React, { InputHTMLAttributes, useState } from "react";
+import React, { InputHTMLAttributes } from "react";
+import * as CSS from "csstype";
 
-type InputFieldProps = InputHTMLAttributes<HTMLInputElement> & {
-  label: string;
-  name: string;
-  isRequired: boolean;
-};
+type InputFieldProps = InputHTMLAttributes<HTMLInputElement> &
+  FormControlProps & {
+    label: string;
+    name: string;
+    labelAlign?: ResponsiveValue<CSS.Property.TextAlign>;
+  };
 
 export const InputField: React.FC<InputFieldProps> = ({
   label,
   size: _,
-  isRequired,
+  labelAlign,
   ...props
 }) => {
   const [field, { error }] = useField(props);
   return (
-    <FormControl isRequired={isRequired} isInvalid={!!error}>
-      <FormLabel htmlFor={field.name}>{label}</FormLabel>
+    <FormControl {...props} isInvalid={!!error}>
+      {labelAlign ? (
+        <FormLabel textAlign={labelAlign} htmlFor={field.name}>
+          {label}
+        </FormLabel>
+      ) : (
+        <FormLabel htmlFor={field.name}>{label}</FormLabel>
+      )}
       <Input {...field} {...props} id={field.name} />
       {error ? <FormErrorMessage>{error}</FormErrorMessage> : null}
     </FormControl>

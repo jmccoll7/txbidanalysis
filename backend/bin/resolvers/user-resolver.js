@@ -10,29 +10,48 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
-import { Arg, Ctx, Field, Int, Mutation, ObjectType, Query, Resolver, UseMiddleware, } from "type-graphql";
+import { Arg, Ctx, Field, Int, Mutation, ObjectType, Query, Resolver, } from "type-graphql";
 import argon2 from "argon2";
 import { User } from "../entities/user-entity";
-import { createAccessToken, isAuth, sendRefreshToken, } from "../auth";
+import { clearRefreshToken, createAccessToken, sendRefreshToken } from "../auth";
 import { AppDataSource } from "../data-source";
+import jwt from "jsonwebtoken";
 let LoginResponse = class LoginResponse {
 };
 __decorate([
     Field(),
     __metadata("design:type", String)
 ], LoginResponse.prototype, "accessToken", void 0);
+__decorate([
+    Field(() => User),
+    __metadata("design:type", User)
+], LoginResponse.prototype, "user", void 0);
 LoginResponse = __decorate([
     ObjectType()
 ], LoginResponse);
 let UserResolver = class UserResolver {
-    me() {
-        return "me";
+    me(context) {
+        const authorization = context.req.headers["authorization"];
+        if (!authorization) {
+            return null;
+        }
+        try {
+            const token = authorization.split(" ")[1];
+            const payload = jwt.verify(token, process.env.ACCESS_TOKEN_PRIVATE_KEY);
+            context.payload = payload;
+            return User.findOneBy({ id: payload.userId });
+        }
+        catch (err) {
+            console.log(err);
+            return null;
+        }
+    }
+    async logout({ res }) {
+        clearRefreshToken(res);
+        return true;
     }
     users() {
         return User.find();
-    }
-    bye({ payload }) {
-        return `User ID: ${payload.userId}`;
     }
     async register(email, password) {
         const hashedPassword = await argon2.hash(password);
@@ -65,30 +84,31 @@ let UserResolver = class UserResolver {
             sendRefreshToken(ctx.res, user);
             return {
                 accessToken: createAccessToken(user),
+                user,
             };
         }
     }
 };
 __decorate([
-    Query(() => String),
+    Query(() => User, { nullable: true }),
+    __param(0, Ctx()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", void 0)
 ], UserResolver.prototype, "me", null);
+__decorate([
+    Mutation(() => Boolean),
+    __param(0, Ctx()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], UserResolver.prototype, "logout", null);
 __decorate([
     Query(() => [User]),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], UserResolver.prototype, "users", null);
-__decorate([
-    Query(() => String),
-    UseMiddleware(isAuth),
-    __param(0, Ctx()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", void 0)
-], UserResolver.prototype, "bye", null);
 __decorate([
     Mutation(() => Boolean),
     __param(0, Arg("email")),

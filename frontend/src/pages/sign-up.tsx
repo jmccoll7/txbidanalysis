@@ -8,12 +8,14 @@ import {
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { Form, Formik, FormikProps, useFormik } from "formik";
+import { Form, Formik, FormikProps } from "formik";
 import React, { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { AppHeader } from "../components/AppHeader";
 import { ColorModeSwitcher } from "../components/ColorModeSwitcher";
 import { InputField, PasswordInputField } from "../components/InputField";
+import { useRegisterMutation } from "../gql/graphql";
+import { router } from "../router";
 
 interface SignUpProps {}
 
@@ -22,8 +24,9 @@ interface Values {
   password: string;
 }
 
-export const SignUp: React.FC<SignUpProps> = ({}) => {
+export const SignUp: React.FC<SignUpProps> = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [register] = useRegisterMutation();
   return (
     <>
       <Box>
@@ -69,8 +72,15 @@ export const SignUp: React.FC<SignUpProps> = ({}) => {
                   password: "",
                 }}
                 onSubmit={async (values) => {
-                  console.log("Registration complete");
-                  console.log(values.email, values.password);
+                  const response = register({
+                    variables: {
+                      email: values.email,
+                      password: values.password,
+                    },
+                  });
+                  console.log("Registration complete.");
+                  console.log(response);
+                  router.navigate("/");
                 }}
               >
                 {(props: FormikProps<Values>) => (

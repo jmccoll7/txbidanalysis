@@ -45,7 +45,36 @@ const hostname = "localhost";
 const app = express();
 // Cookie-Parser
 app.use(cookieParser());
-app.post("/refresh_token", async (req, res) => {
+// Redis Client
+const redisClient = createClient({
+    legacyMode: true,
+});
+redisClient.connect().catch(console.error);
+// Express-Session with Redis-Connect
+const RedisStore = connectRedis(session);
+app.use(session({
+    store: new RedisStore({ client: redisClient }),
+    saveUninitialized: false,
+    secret: "ajijfopsdppfjiweriufwqiorjfnksdlkjj",
+    resave: false,
+    name: "sessioncookie",
+    cookie: {
+        httpOnly: true,
+        sameSite: "lax",
+        secure: __prod__,
+        maxAge: 1000 * 60 * 60, // 1 hour
+    },
+}));
+const corsOptions = {
+    origin: process.env.FRONTEND_URL,
+    credentials: true
+};
+app.set("trust proxy", !__prod__);
+// Express using body-parser, cors, and Apollo
+app.use("/graphql", bodyParser.json(), cors(corsOptions), expressMiddleware(server, {
+    context: async ({ req, res }) => ({ req, res }),
+}));
+app.post("/refresh_token", cors(corsOptions), async (req, res) => {
     const token = req.cookies.jwtcookie;
     if (!token) {
         return sendInvalidToken(res);
@@ -69,34 +98,6 @@ app.post("/refresh_token", async (req, res) => {
     sendRefreshToken(res, user);
     return res.send({ ok: true, accessToken: createAccessToken(user) });
 });
-// Redis Client
-const redisClient = createClient({
-    legacyMode: true,
-});
-redisClient.connect().catch(console.error);
-// Express-Session with Redis-Connect
-const RedisStore = connectRedis(session);
-app.use(session({
-    store: new RedisStore({ client: redisClient }),
-    saveUninitialized: false,
-    secret: "ajijfopsdppfjiweriufwqiorjfnksdlkjj",
-    resave: false,
-    name: "sessioncookie",
-    cookie: {
-        httpOnly: true,
-        sameSite: "lax",
-        secure: __prod__,
-        maxAge: 1000 * 60 * 60, // 1 hour
-    },
-}));
-const corsOptions = {
-    origin: process.env.FRONTEND_URL,
-};
-app.set("trust proxy", !__prod__);
-// Express using body-parser, cors, and Apollo
-app.use("/graphql", bodyParser.json(), cors(corsOptions), expressMiddleware(server, {
-    context: async ({ req, res }) => ({ req, res }),
-}));
 app.listen(port, hostname, () => {
     console.log(`GraphQL API listening on port ${port}`);
 });

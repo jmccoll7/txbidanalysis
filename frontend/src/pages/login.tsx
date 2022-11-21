@@ -3,22 +3,30 @@ import {
   Button,
   Checkbox,
   Flex,
-  FormControl,
-  FormLabel,
   Heading,
-  Input,
   Link,
   Stack,
   Text,
   useColorModeValue,
 } from "@chakra-ui/react";
+import { Form, Formik, FormikProps } from "formik";
 import React from "react";
+import { getAccessToken, setAccessToken } from "../access-token";
 import { AppHeader } from "../components/AppHeader";
 import { ColorModeSwitcher } from "../components/ColorModeSwitcher";
+import { InputField } from "../components/InputField";
+import { MeDocument, MeQuery, useLoginMutation } from "../gql/graphql";
+import { router } from "../router";
+
+interface Values {
+  email: string;
+  password: string;
+}
 
 interface LoginProps {}
 
 export const Login: React.FC<LoginProps> = ({}) => {
+  const [login] = useLoginMutation();
   return (
     <>
       <Box>
@@ -55,42 +63,87 @@ export const Login: React.FC<LoginProps> = ({}) => {
             p={8}
           >
             <Stack spacing={4}>
-              <FormControl id="email">
-                <FormLabel>Email address</FormLabel>
-                <Input type="email" />
-              </FormControl>
-              <FormControl id="password">
-                <FormLabel>Password</FormLabel>
-                <Input type="password" />
-              </FormControl>
-              <Stack spacing={10}>
-                <Stack
-                  direction={{ base: "column", sm: "row" }}
-                  align={"start"}
-                  justify={"space-between"}
-                >
-                  <Checkbox>Remember me</Checkbox>
-                  <Link
-                    _hover={{
-                      color: "blue.500",
-                    }}
-                    color={"blue.400"}
-                    as={"a"}
-                    href={"/forgot-password"}
-                  >
-                    Forgot password?
-                  </Link>
-                </Stack>
-                <Button
-                  bg={"blue.400"}
-                  color={"white"}
-                  _hover={{
-                    bg: "blue.500",
-                  }}
-                >
-                  Sign in
-                </Button>
-              </Stack>
+              <Formik
+                initialValues={{
+                  email: "",
+                  password: "",
+                }}
+                onSubmit={async (values) => {
+                  const response = await login({
+                    variables: {
+                      email: values.email,
+                      password: values.password,
+                    },
+                    update: (store, { data }) => {
+                      if (!data) {
+                        return null;
+                      }
+                      store.writeQuery<MeQuery>({
+                        query: MeDocument,
+                        data: {
+                          me: data.login.user,
+                        },
+                      });
+                    },
+                  });
+                  const responseData = response.data;
+                  console.log("Login complete.");
+                  console.log(responseData);
+
+                  if (responseData) {
+                    setAccessToken(responseData.login.accessToken);
+                  }
+
+                  router.navigate("/");
+                  console.log("setting token: ", getAccessToken());
+                }}
+              >
+                {(props: FormikProps<Values>) => (
+                  <Form>
+                    <InputField
+                      isRequired={false}
+                      name="email"
+                      type="email"
+                      label="Email address"
+                    />
+                    <InputField
+                      isRequired={false}
+                      name="password"
+                      type="password"
+                      label="Password"
+                    />
+                    <Stack spacing={10}>
+                      <Stack
+                        direction={{ base: "column", sm: "row" }}
+                        align={"start"}
+                        justify={"space-between"}
+                      >
+                        <Checkbox>Remember me</Checkbox>
+                        <Link
+                          _hover={{
+                            color: "blue.500",
+                          }}
+                          color={"blue.400"}
+                          as={"a"}
+                          href={"/forgot-password"}
+                        >
+                          Forgot password?
+                        </Link>
+                      </Stack>
+                      <Button
+                        bg={"blue.400"}
+                        color={"white"}
+                        _hover={{
+                          bg: "blue.500",
+                        }}
+                        type="submit"
+                      >
+                        Sign in
+                      </Button>
+                    </Stack>
+                  </Form>
+                )}
+              </Formik>
             </Stack>
             <Stack>
               <Text pt={2}>

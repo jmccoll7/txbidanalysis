@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from "react-router-dom";
 import { DataVisualization } from "./pages/data-visualization";
 import { ForgotPassword } from "./pages/forgot-password";
 import { Home } from "./pages/home";
+import { ItemSearch } from "./pages/item-search";
 import { Login } from "./pages/login";
 import { Query } from "./pages/query";
 import { ResetPassword } from "./pages/reset-password";
@@ -15,6 +16,10 @@ export const router = createBrowserRouter([
   {
     path: "/query",
     element: <Query />,
+  },
+  {
+    path: "/itemsearch",
+    element: <ItemSearch />,
   },
   {
     path: "data-visualization",

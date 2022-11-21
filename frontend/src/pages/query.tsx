@@ -7,14 +7,19 @@ import {
 } from "@chakra-ui/react";
 import { Select } from "chakra-react-select";
 import { Form, Formik, Field } from "formik";
-import React from "react";
+import React, { useState } from "react";
 import { InputField } from "../components/InputField";
 import { Navbar } from "../components/Navbar";
+import { QueryResults } from "../components/QueryResults";
 import { contractors, itemCodes } from "./temp-data";
 
 interface QueryProps {}
 
-export const Query: React.FC<QueryProps> = ({}) => {
+export const Query: React.FC<QueryProps> = () => {
+  const [complete, setComplete] = useState(false);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+  const [itemCode, setItemCode] = useState(0);
   return (
     <>
       <Navbar />
@@ -22,92 +27,39 @@ export const Query: React.FC<QueryProps> = ({}) => {
         initialValues={{
           startDate: new Date(),
           endDate: new Date(),
-          contractors: [] as string[],
-          itemCode: null as number | null,
+          itemCode: "",
         }}
         onSubmit={async (values) => {
-          alert(JSON.stringify(values, null, 2));
+          setStartDate(values.startDate);
+          setEndDate(values.endDate);
+          setItemCode(Number(values.itemCode));
+          setComplete(true);
         }}
       >
         {(props) => (
-          <Form>
+          <Form onSubmit={props.handleSubmit}>
             <HStack pl={4} marginTop={4} mr={4} alignItems={"start"}>
-              <InputField isRequired={false} name="startDate" type="date" label="Start Date" />
-              <InputField isRequired={false} name="endDate" type="date" label="End Date" />
-              <Field name="contractors">
-                {(props: any) => {
-                  console.log(props.field, props.form, props.meta, props);
-                  return (
-                    <FormControl isInvalid={!!props.meta.error} maxW={"400px"}>
-                      <FormLabel htmlFor={props.field.name}>
-                        Contractors
-                      </FormLabel>
-                      <Select
-                        placeholder="Select All"
-                        id={props.field.name}
-                        name={props.field.name}
-                        isMulti
-                        options={contractors}
-                        value={
-                          contractors
-                            ? contractors.find(
-                                (option) => option.value === props.field.value
-                              )
-                            : ""
-                        }
-                        onChange={(options) => {
-                          var optionValues: string[] = [];
-                          options.forEach((option: any) => {
-                            optionValues.push(option.value);
-                          });
-                          props.form.setFieldValue(
-                            props.field.name,
-                            optionValues
-                          );
-                        }}
-                        onBlur={props.field.onBlur}
-                      />
-                      {props.field.error ? (
-                        <FormErrorMessage>{props.field.error}</FormErrorMessage>
-                      ) : null}
-                    </FormControl>
-                  );
-                }}
-              </Field>
-              <Field name="itemCode">
-                {(props: any) => {
-                  console.log(props.field, props.form, props.meta);
-                  return (
-                    <FormControl isInvalid={!!props.meta.error} maxW={"400px"}>
-                      <FormLabel htmlFor={props.field.name}>
-                        Item Code
-                      </FormLabel>
-                      <Select
-                        id={props.field.name}
-                        name={props.field.name}
-                        options={itemCodes}
-                        value={
-                          itemCodes
-                            ? itemCodes.find(
-                                (option) => option.value === props.field.value
-                              )
-                            : ""
-                        }
-                        onChange={(option: any) =>
-                          props.form.setFieldValue(
-                            props.field.name,
-                            option.value
-                          )
-                        }
-                        onBlur={props.field.onBlur}
-                      />
-                      {props.field.error ? (
-                        <FormErrorMessage>{props.field.error}</FormErrorMessage>
-                      ) : null}
-                    </FormControl>
-                  );
-                }}
-              </Field>
+              <InputField
+                isRequired={false}
+                name="startDate"
+                type="date"
+                label="Start Date"
+                maxW={"200px"}
+              />
+              <InputField
+                isRequired={false}
+                name="endDate"
+                type="date"
+                label="End Date"
+                maxW={"200px"}
+              />
+              <InputField
+                isRequired={false}
+                name="itemCode"
+                type="text"
+                label="Item Code"
+                maxW={"300px"}
+              />
             </HStack>
             <Button
               ml={"auto"}
@@ -124,6 +76,15 @@ export const Query: React.FC<QueryProps> = ({}) => {
           </Form>
         )}
       </Formik>
+      {/* {complete ? console.log(itemCode, startDate, endDate) : null} */}
+      {complete ? (
+        <QueryResults
+          type={"query"}
+          startDate={startDate}
+          endDate={endDate}
+          itemCode={itemCode}
+        />
+      ) : null}
     </>
   );
 };
