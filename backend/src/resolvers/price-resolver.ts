@@ -49,9 +49,6 @@ export class PriceResolver {
         bidDate: (item.project as any).bid_date,
       });
     });
-    // console.log(result[0].unit_price);
-    // console.log(result[0].contractor);
-    // console.log((result[0].project as any).bid_date);
     return structuredResult;
   }
 

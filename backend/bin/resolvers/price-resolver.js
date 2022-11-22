@@ -47,9 +47,6 @@ let PriceResolver = class PriceResolver {
                 bidDate: item.project.bid_date,
             });
         });
-        // console.log(result[0].unit_price);
-        // console.log(result[0].contractor);
-        // console.log((result[0].project as any).bid_date);
         return structuredResult;
     }
     async item(price) {
