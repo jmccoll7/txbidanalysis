@@ -11,7 +11,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "start": "node ./bin/index.js",
+    "start": "node --es-module-specifier-resolution=node ./bin/index.js",
     "dev": "nodemon --es-module-specifier-resolution=node ./bin/index.js"
   },
   "devDependencies": {

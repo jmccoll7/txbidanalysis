@@ -30,15 +30,14 @@ const schema = await buildSchema({
 // ApolloServer
 const server = new ApolloServer({
     schema,
-
 });
 await server.start();
 // Express
 const port = 4000;
+const hostname = "localhost";
 const app = express();
 // Cookie-Parser
 app.use(cookieParser());
-
 const corsOptions = {
     origin: process.env.FRONTEND_URL,
     credentials: true
@@ -72,6 +71,6 @@ app.post("/refresh_token", cors(corsOptions), async (req, res) => {
     sendRefreshToken(res, user);
     return res.send({ ok: true, accessToken: createAccessToken(user) });
 });
-app.listen(port, () => {
+app.listen(port, hostname, () => {
     console.log(`GraphQL API listening on port ${port}`);
 });

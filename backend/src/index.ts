@@ -1,26 +1,22 @@
-import dotenv from "dotenv";
-dotenv.config();
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
-import { ApolloServerPluginLandingPageGraphQLPlayground } from "@apollo/server-plugin-landing-page-graphql-playground";
 import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
 import cors from "cors";
+import dotenv from "dotenv";
 import express from "express";
-import session from "express-session";
-import connectRedis from "connect-redis";
-import { createClient } from "redis";
+import jwt from "jsonwebtoken";
 import "reflect-metadata";
 import { buildSchema } from "type-graphql";
+import { createAccessToken, sendInvalidToken, sendRefreshToken } from "./auth";
+import { __prod__ } from "./constants";
 import { AppDataSource } from "./data-source";
+import { User } from "./entities/user-entity";
 import { ItemResolver } from "./resolvers/item-resolver";
 import { PriceResolver } from "./resolvers/price-resolver";
 import { ProjectResolver } from "./resolvers/project-resolver";
 import { UserResolver } from "./resolvers/user-resolver";
-import { __prod__ } from "./constants";
-import cookieParser from "cookie-parser";
-import { User } from "./entities/user-entity";
-import { createAccessToken, sendInvalidToken, sendRefreshToken } from "./auth";
-import jwt from "jsonwebtoken";
+dotenv.config();
 
 // TypeORM
 AppDataSource.initialize()
@@ -37,9 +33,6 @@ const schema = await buildSchema({
 // ApolloServer
 const server = new ApolloServer({
   schema,
-  plugins: !__prod__
-    ? [ApolloServerPluginLandingPageGraphQLPlayground()]
-    : undefined,
 });
 
 await server.start();
@@ -52,30 +45,6 @@ const app = express();
 
 // Cookie-Parser
 app.use(cookieParser());
-
-// Redis Client
-const redisClient = createClient({
-  legacyMode: true,
-});
-redisClient.connect().catch(console.error);
-
-// Express-Session with Redis-Connect
-const RedisStore = connectRedis(session);
-app.use(
-  session({
-    store: new RedisStore({ client: redisClient }),
-    saveUninitialized: false,
-    secret: "ajijfopsdppfjiweriufwqiorjfnksdlkjj",
-    resave: false,
-    name: "sessioncookie",
-    cookie: {
-      httpOnly: true,
-      sameSite: "lax",
-      secure: __prod__,
-      maxAge: 1000 * 60 * 60, // 1 hour
-    },
-  })
-);
 
 const corsOptions = {
   origin: process.env.FRONTEND_URL,
