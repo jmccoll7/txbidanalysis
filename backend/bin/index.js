@@ -19,9 +19,6 @@ import { UserResolver } from "./resolvers/user-resolver";
 dotenv.config();
 // TypeORM
 AppDataSource.initialize()
-    .then(() => {
-    // here you can start to work with your database
-})
     .catch((error) => console.log(error));
 // TypeGraphQL
 const schema = await buildSchema({
@@ -34,7 +31,6 @@ const server = new ApolloServer({
 await server.start();
 // Express
 const port = 4000;
-const hostname = "localhost";
 const app = express();
 // Cookie-Parser
 app.use(cookieParser());
@@ -71,6 +67,6 @@ app.post("/refresh_token", cors(corsOptions), async (req, res) => {
     sendRefreshToken(res, user);
     return res.send({ ok: true, accessToken: createAccessToken(user) });
 });
-app.listen(port, hostname, () => {
+app.listen(port, () => {
     console.log(`GraphQL API listening on port ${port}`);
 });

@@ -20,9 +20,6 @@ dotenv.config();
 
 // TypeORM
 AppDataSource.initialize()
-  .then(() => {
-    // here you can start to work with your database
-  })
   .catch((error) => console.log(error));
 
 // TypeGraphQL
@@ -39,8 +36,6 @@ await server.start();
 
 // Express
 const port: number = 4000;
-const hostname: string = "localhost";
-
 const app = express();
 
 // Cookie-Parser
@@ -90,6 +85,6 @@ app.post("/refresh_token", cors(corsOptions), async (req, res) => {
   return res.send({ ok: true, accessToken: createAccessToken(user) });
 });
 
-app.listen(port, hostname, () => {
+app.listen(port, () => {
   console.log(`GraphQL API listening on port ${port}`);
 });
