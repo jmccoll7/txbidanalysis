@@ -48,7 +48,7 @@ git clone https://github.com/jmccoll7/txbidanalysis.git
 
 cd txbidanalysis/frontend
 
-# Change x.x.x.x to the IP Address of the backend server
+/# Change x.x.x.x to the IP Address of the backend server
 cat <<EOF > .env
 REACT_APP_BACKEND_URL=http://x.x.x.x
 EOF
