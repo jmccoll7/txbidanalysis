@@ -19,6 +19,7 @@ git clone https://github.com/jmccoll7/txbidanalysis.git
 cd txbidanalysis/backend
 
 \# Edit these values as appropriate.
+
 cat <<EOF > .env
 DATABASE_URL=mysql://user:password@x.x.x.x:3306/txdotbidsdb
 FRONTEND_URL=http://x.x.x.x:80
@@ -48,7 +49,8 @@ git clone https://github.com/jmccoll7/txbidanalysis.git
 
 cd txbidanalysis/frontend
 
-/# Change x.x.x.x to the IP Address of the backend server
+\# Change x.x.x.x to the IP Address of the backend server
+
 cat <<EOF > .env
 REACT_APP_BACKEND_URL=http://x.x.x.x
 EOF
