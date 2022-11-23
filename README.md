@@ -18,7 +18,7 @@ git clone https://github.com/jmccoll7/txbidanalysis.git
 
 cd txbidanalysis/backend
 
-# Edit these values as appropriate.
+\# Edit these values as appropriate.
 cat <<EOF > .env
 DATABASE_URL=mysql://user:password@x.x.x.x:3306/txdotbidsdb
 FRONTEND_URL=http://x.x.x.x:80
