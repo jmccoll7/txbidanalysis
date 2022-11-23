@@ -1,17 +1,11 @@
 import {
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  HStack,
+  Button, HStack
 } from "@chakra-ui/react";
-import { Select } from "chakra-react-select";
-import { Form, Formik, Field } from "formik";
+import { Form, Formik } from "formik";
 import React, { useState } from "react";
 import { InputField } from "../components/InputField";
 import { Navbar } from "../components/Navbar";
 import { QueryResults } from "../components/QueryResults";
-import { contractors, itemCodes } from "./temp-data";
 
 interface QueryProps {}
 
@@ -76,7 +70,6 @@ export const Query: React.FC<QueryProps> = () => {
           </Form>
         )}
       </Formik>
-      {/* {complete ? console.log(itemCode, startDate, endDate) : null} */}
       {complete ? (
         <QueryResults
           type={"query"}

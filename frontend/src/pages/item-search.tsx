@@ -5,7 +5,6 @@ import { Form } from "react-router-dom";
 import { InputField } from "../components/InputField";
 import { Navbar } from "../components/Navbar";
 import { QueryResults } from "../components/QueryResults";
-import { useGetItemsQuery } from "../gql/graphql";
 
 interface ItemSearchProps {}
 
