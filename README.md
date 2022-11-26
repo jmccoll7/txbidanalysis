@@ -56,6 +56,7 @@ cd txbidanalysis/frontend
 ```
 cat <<EOF > .env
 REACT_APP_BACKEND_URL=http://x.x.x.x
+REACT_APP_POWERBI_URL=https://app.powerbi.com/.........
 EOF
 ```
 
